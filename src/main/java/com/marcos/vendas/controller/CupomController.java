@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.marcos.vendas.dto.CupomRequest;
 import com.marcos.vendas.service.CupomService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("cupom")
 public class CupomController {
@@ -21,7 +23,7 @@ public class CupomController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> registrarCupom(@RequestBody CupomRequest request) {
+	public ResponseEntity<Void> registrarCupom(@RequestBody @Valid CupomRequest request) {
 		service.registrarCupom(request);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
