@@ -42,7 +42,8 @@ public class CupomControllerIT {
 	
 	@Test
 	@WithMockUser
-	void givenValidCupomRequest_whenRegistrarCupom_thenReturnHttpStatusCode201() throws JsonProcessingException, Exception {
+	void givenValidCupomRequest_whenRegistrarCupom_thenReturnHttpStatusCode201AndRegistersCupom()
+			throws JsonProcessingException, Exception {
 		CupomRequest request = new CupomRequest("693.488.350-09", new BigDecimal("74.99"), TipoPagamento.DEBITO);
 		
 		mvc.perform(post("/cupom")
