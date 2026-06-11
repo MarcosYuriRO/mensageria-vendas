@@ -1,7 +1,8 @@
 package com.marcos.vendas.service;
 
 import com.marcos.vendas.dto.CupomRequest;
+import com.marcos.vendas.dto.CupomResponse;
 
 public interface CupomService {
-	void registrarCupom(CupomRequest response);
+	CupomResponse registrarCupom(CupomRequest response);
 }

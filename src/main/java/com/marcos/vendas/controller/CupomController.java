@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.marcos.vendas.dto.CupomRequest;
+import com.marcos.vendas.dto.CupomResponse;
 import com.marcos.vendas.service.CupomService;
 
 import jakarta.validation.Valid;
@@ -23,8 +24,7 @@ public class CupomController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> registrarCupom(@RequestBody @Valid CupomRequest request) {
-		service.registrarCupom(request);
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+	public ResponseEntity<CupomResponse> registrarCupom(@RequestBody @Valid CupomRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.registrarCupom(request));
 	}
 }
