@@ -44,7 +44,7 @@ public class CupomControllerIT {
 	@WithMockUser
 	void givenValidCupomRequest_whenRegistrarCupom_thenReturnHttpStatusCode201AndRegistersCupom()
 			throws JsonProcessingException, Exception {
-		CupomRequest request = new CupomRequest("693.488.350-09", new BigDecimal("74.99"), TipoPagamento.DEBITO);
+		CupomRequest request = new CupomRequest("693.488.350-09", new BigDecimal("74.99"), TipoPagamento.DEBITO, "21820-959");
 		
 		mvc.perform(post("/cupom")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -59,7 +59,8 @@ public class CupomControllerIT {
 		assertEquals(request.cpf(), cupomRegistrado.getCpf());
 		assertEquals(request.tipoPagamento(), cupomRegistrado.getTipoPagamento());
 		assertTrue(request.valor().compareTo(cupomRegistrado.getValor()) == 0);
-		
+		assertEquals("Rua Fonseca", cupomRegistrado.getEndereco().getLogradouro());
+		assertEquals("Rio de Janeiro", cupomRegistrado.getEndereco().getLocalidade());
 	}
 	
 }
