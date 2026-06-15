@@ -40,9 +40,10 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(FeignException.class)
 	public ResponseEntity<ErroResponse> lidarComErroDoFeignClient(FeignException ex){
-		HttpStatus status = HttpStatus.BAD_REQUEST;
+		HttpStatus status = HttpStatus.BAD_GATEWAY;
 		
-		ErroResponse erro = new ErroResponse(Instant.now(), status.value(), "Erro ao lidar com CEP", ex.getMessage());
+		ErroResponse erro = new ErroResponse(Instant.now(), status.value(), "Erro ao lidar com CEP", 
+				"Não foi possível consultar os dados do CEP no momento. O serviço fiscal pode estar indisponível");
 		
 		return ResponseEntity.status(status).body(erro);
 	}
