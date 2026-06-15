@@ -9,6 +9,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.marcos.vendas.exception.CepInvalidoException;
+
+import feign.FeignException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,6 +25,24 @@ public class GlobalExceptionHandler {
 	            .collect(Collectors.joining(", "));
 		
 		ErroResponse erro = new ErroResponse(Instant.now(), status.value(), "Dados de entrada inválidos", mensagemLimpa);
+		
+		return ResponseEntity.status(status).body(erro);
+	}
+	
+	@ExceptionHandler(CepInvalidoException.class)
+	public ResponseEntity<ErroResponse> lidarComCEPInvalido(CepInvalidoException ex){
+		HttpStatus status = HttpStatus.NOT_FOUND;
+		
+		ErroResponse erro = new ErroResponse(Instant.now(), status.value(), "CEP inválido", ex.getMessage());
+		
+		return ResponseEntity.status(status).body(erro);
+	}
+	
+	@ExceptionHandler(FeignException.class)
+	public ResponseEntity<ErroResponse> lidarComErroDoFeignClient(FeignException ex){
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+		
+		ErroResponse erro = new ErroResponse(Instant.now(), status.value(), "Erro ao lidar com CEP", ex.getMessage());
 		
 		return ResponseEntity.status(status).body(erro);
 	}
