@@ -8,10 +8,14 @@ import com.marcos.vendas.domain.Endereco;
 import com.marcos.vendas.dto.CupomRequest;
 import com.marcos.vendas.dto.CupomResponse;
 import com.marcos.vendas.dto.EnderecoResponse;
+import com.marcos.vendas.exception.CepInvalidoException;
 import com.marcos.vendas.repository.CupomRepository;
 import com.marcos.vendas.service.CupomService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class CupomServiceImpl implements CupomService {
 	
 	private CupomRepository repository;
@@ -25,7 +29,15 @@ public class CupomServiceImpl implements CupomService {
 
 	@Override
 	public CupomResponse registrarCupom(CupomRequest request) {
+		
+		log.info("Iniciando registro de cupom. CPF do cliente: {}, CEP de entrega: {}", request.cpf(), request.cep());
+		
 		EnderecoResponse viaCep = viaCepClient.buscarEnderecoPorCep(request.cep());
+		
+		if (viaCep == null || Boolean.TRUE.equals(viaCep.erro())) {
+			log.warn("Falha no cadastro: O CEP {} não foi localizado no ViaCEP.");
+			throw new CepInvalidoException("O CEP informado não  foi encontrado nos sistemas.");
+		}
 		
 		Endereco endereco = Endereco.builder()
 				.cep(viaCep.cep())
@@ -50,6 +62,8 @@ public class CupomServiceImpl implements CupomService {
 				cupom.getValor(),
 				cupom.getEndereco().getLogradouro(),
 				cupom.getEndereco().getLocalidade());
+		
+		log.info("Cupom registrado com sucesso no banco de dados. ID gerado: {}");
 		
 		return response;
 	}
