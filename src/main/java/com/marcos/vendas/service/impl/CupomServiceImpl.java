@@ -1,8 +1,10 @@
 package com.marcos.vendas.service.impl;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import com.marcos.vendas.client.ViaCepClient;
+import com.marcos.vendas.config.RabbitMQConfig;
 import com.marcos.vendas.domain.Cupom;
 import com.marcos.vendas.domain.Endereco;
 import com.marcos.vendas.dto.CupomRequest;
@@ -18,13 +20,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CupomServiceImpl implements CupomService {
 	
-	private CupomRepository repository;
+	private final CupomRepository repository;
 	
-	private ViaCepClient viaCepClient;
+	private final ViaCepClient viaCepClient;
 	
-	public CupomServiceImpl(CupomRepository repository, ViaCepClient viacepClient) {
+	private final RabbitTemplate rabbitTemplate;
+	
+	public CupomServiceImpl(CupomRepository repository, ViaCepClient viacepClient, RabbitTemplate rabbitTemplate) {
 		this.repository = repository;
 		this.viaCepClient = viacepClient;
+		this.rabbitTemplate = rabbitTemplate;
 	}
 
 	@Override
@@ -64,6 +69,13 @@ public class CupomServiceImpl implements CupomService {
 				cupom.getEndereco().getLocalidade());
 		
 		log.info("Cupom registrado com sucesso no banco de dados. ID gerado: {}");
+		
+		try {
+			log.info("Publicando evento de cupom criado no RabbitMQ. ID: {}", response.id());
+			rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_CUPOM, "", response);
+		} catch (Exception e) {
+			log.error("Falha ao enviar mensagem para o Broker, mas a venda foi salva localmente. Erro {}", e.getMessage());
+		}
 		
 		return response;
 	}
